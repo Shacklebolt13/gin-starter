@@ -1,6 +1,6 @@
 package utils
 
-import log "github.com/rs/zerolog/log"
+import "github.com/rs/zerolog/log"
 
 func Fatal[T any](obj T, err error) T {
 	if err != nil {
