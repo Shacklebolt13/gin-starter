@@ -1,15 +1,30 @@
 package config
 
-import "github.com/aws/aws-sdk-go-v2/aws"
+import (
+	"sync"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+)
 
 type AppConfig struct {
-	Aws *aws.Config
-	Env *envConfig
+	Aws     *aws.Config
+	Env     *EnvConfig
+	Process *ProcessConfig
 }
 
-func NewAppConfig(env *envConfig, awsConfig *aws.Config) *AppConfig {
-	return &AppConfig{
-		Aws: awsConfig,
-		Env: env,
-	}
+var config *AppConfig
+
+func NewAppConfig(
+	env *EnvConfig,
+	awsConfig *aws.Config,
+	processConfig *ProcessConfig,
+) *AppConfig {
+	sync.OnceFunc(func() {
+		config = &AppConfig{
+			Aws:     awsConfig,
+			Env:     env,
+			Process: processConfig,
+		}
+	})()
+	return config
 }

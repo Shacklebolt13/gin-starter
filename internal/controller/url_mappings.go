@@ -1,10 +1,9 @@
 package controller
 
 import (
-	"cert/internal/controller/health"
+	"gin-starter/internal/controller/health"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 )
 
 type UrlMapping interface {
@@ -16,7 +15,6 @@ type urlMapping struct {
 }
 
 func (u *urlMapping) MapAll(engine *gin.Engine) {
-	log.Info().Msg("Building Health Mappings")
 	healthGroup := engine.Group("/health")
 	u.health.Map(healthGroup)
 }

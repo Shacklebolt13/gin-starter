@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cert/di"
+	"gin-starter/di"
 
 	"github.com/gin-gonic/gin"
 )

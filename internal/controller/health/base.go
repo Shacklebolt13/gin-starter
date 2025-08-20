@@ -1,7 +1,7 @@
 package health
 
 import (
-	"cert/internal/controller/generic"
+	"gin-starter/internal/controller/generic"
 
 	"github.com/gin-gonic/gin"
 )
