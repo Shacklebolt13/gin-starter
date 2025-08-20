@@ -1,0 +1,7 @@
+version: "2"
+run:
+  tests: true # Indicates linter should run on test files as well.
+  concurrency: 4 # Specifies the maximum number of concurrent linter tasks to run.
+
+issues:
+  fix: true
