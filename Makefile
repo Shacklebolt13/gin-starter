@@ -33,8 +33,9 @@ build-api:
 
 build: di lint build-api
 
-dev-nt: clean build-api
-	@cd $(MAKEFILE_DIR) && .\out\api$(EXT) 
-
 dev: clean build-api
-	@cd $(MAKEFILE_DIR) && ./out/api
+ifeq ($(OS),Windows_NT)
+	@cd $(MAKEFILE_DIR) && .\out\api$(EXT) 
+else
+	@cd $(MAKEFILE_DIR) && ./out/api	
+endif
