@@ -15,10 +15,12 @@ var awsOnce sync.Once
 func ConfigureAws() *aws.Config {
 	awsOnce.Do(func() {
 		var err error
+
 		awsCfg, err = aws_config.LoadDefaultConfig(context.TODO())
 		if err != nil {
 			log.Fatal().Err(err).Send()
 		}
 	})
+
 	return &awsCfg
 }

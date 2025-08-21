@@ -30,5 +30,6 @@ func ParseEnvironment() *EnvConfig {
 			log.Fatal().Err(err).Send()
 		}
 	})
+
 	return &envConfig
 }

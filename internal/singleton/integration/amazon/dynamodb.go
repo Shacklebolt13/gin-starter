@@ -14,5 +14,6 @@ func NewDynamoDBClient(cfg *config.AppConfig) *dynamodb.Client {
 	dynamoDbOnce.Do(func() {
 		dynamodbClient = dynamodb.NewFromConfig(*cfg.Aws)
 	})
+
 	return dynamodbClient
 }

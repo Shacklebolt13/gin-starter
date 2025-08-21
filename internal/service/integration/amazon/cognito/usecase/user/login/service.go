@@ -22,7 +22,6 @@ func (svc *loginServiceImpl) LoginByPassword(ctx context.Context, request LoginB
 	}
 
 	out, err := svc.client.InitiateAuth(ctx, &authInput)
-
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to authenticate user")
 		return nil, err

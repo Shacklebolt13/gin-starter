@@ -27,5 +27,6 @@ func NewAppConfig(
 			Process: processConfig,
 		}
 	})
+
 	return appConfig
 }

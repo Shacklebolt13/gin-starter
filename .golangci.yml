@@ -1,5 +1,42 @@
-# yaml-language-server: $schema= https://golangci-lint.run/jsonschema/golangci.jsonschema.json
 version: "2"
+linters:
+  enable:
+    - errcheck # Ensures that all errors returned by functions are properly checked and handled.
+    - forbidigo # Forbids the use of certain packages or constructs.
+    - funlen # Check function length.
+    - gocognit # Flags functions with high cognitive complexity, encouraging code with better readability and maintainability.
+    - goconst # Detects repeated string or integer constants and suggests refactoring them into constants.
+    - godot # Detects periods in comments.
+    - gosec # Identifies potential security vulnerabilities in your Go code, such as unsafe handling of data or weak cryptographic operations.
+    - gocyclo # Reports functions that exceed a specified cyclomatic complexity threshold, helping to identify overly complex code.
+    - govet # Executes `go vet`, a tool that reports suspicious constructs in Go code that might be bugs.
+    - iface # Detects situations where interface types could be simplified or improved for better maintainability.
+    - importas # Enforces consistent import aliases for specific packages.
+    - nilerr # Ensures error variables are not checked against `nil` where it's redundant or unnecessary.
+    - nilnil # Detects situations where variables are compared against multiple `nil` values unnecessarily.
+    - reassign # Warns when reassignment to a variable should be avoided for clarity or best practices.
+    - staticcheck # Performs advanced static analysis of Go code, catching common mistakes, performance issues, and simplifications.
+    - testifylint # Lints `testify` testing framework usage to ensure that best practices are followed.
+    - unused # Reports unused variables, functions, constants, and similar unused elements in the code.
+    - wsl_v5 # Adds or Removes Empty lines in the code.
+  exclusions:
+    generated: lax
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec
+      - path: migrations.go
+        linters:
+          - staticcheck
+          - gosec
+  settings:
+    gosec:
+      excludes:
+        - G501 #Allow crypto/md5 import
+        - G401 #Allow using math/rand
+    funlen: # tweak these to your liking
+      lines: 80
+      statements: 45
 run:
   tests: true # Indicates linter should run on test files as well.
   concurrency: 4 # Specifies the maximum number of concurrent linter tasks to run.

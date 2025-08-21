@@ -22,5 +22,6 @@ func NewAmazonIntegration(dynamoDbClient *dynamodb.Client, cidpClient *cidp.Clie
 			CIDPClient:     cidpClient,
 		}
 	})
+
 	return amazonIntegration
 }

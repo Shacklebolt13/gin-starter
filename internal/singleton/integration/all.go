@@ -18,5 +18,6 @@ func NewIntegration(amz *amazon.AmazonIntegration) (*ExternalClients, error) {
 			Amz: amz,
 		}
 	})
+
 	return integration, nil
 }

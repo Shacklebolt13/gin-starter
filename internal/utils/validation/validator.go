@@ -12,5 +12,6 @@ type CanValidate struct {
 func (v *CanValidate) Validate() error {
 	validatorObj := validator.New()
 	err := validatorObj.Struct(v)
+
 	return err
 }

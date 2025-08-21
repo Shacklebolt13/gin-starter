@@ -21,5 +21,6 @@ func NewProcessConfig(envConfig *EnvConfig) (*ProcessConfig, error) {
 			Cancel: cancel,
 		}
 	})
+
 	return &processConfig, nil
 }

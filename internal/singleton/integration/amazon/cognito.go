@@ -14,5 +14,6 @@ func NewCidpClient(appConfig *config.AppConfig) *cidp.Client {
 	cidpOnce.Do(func() {
 		cognitoClient = cidp.NewFromConfig(*appConfig.Aws)
 	})
+
 	return cognitoClient
 }
