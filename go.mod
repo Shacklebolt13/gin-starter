@@ -7,6 +7,8 @@ require (
 	github.com/google/wire v0.6.0
 )
 
+require github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.57.0 // indirect
+
 require (
 	github.com/aws/aws-sdk-go-v2 v1.38.0 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.31.0 // indirect
@@ -33,6 +35,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
+	github.com/google/uuid v1.6.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

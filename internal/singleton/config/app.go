@@ -12,19 +12,20 @@ type AppConfig struct {
 	Process *ProcessConfig
 }
 
-var config *AppConfig
+var appConfig *AppConfig
+var once sync.Once
 
 func NewAppConfig(
 	env *EnvConfig,
 	awsConfig *aws.Config,
 	processConfig *ProcessConfig,
 ) *AppConfig {
-	sync.OnceFunc(func() {
-		config = &AppConfig{
+	once.Do(func() {
+		appConfig = &AppConfig{
 			Aws:     awsConfig,
 			Env:     env,
 			Process: processConfig,
 		}
-	})()
-	return config
+	})
+	return appConfig
 }

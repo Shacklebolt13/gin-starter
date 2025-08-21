@@ -7,11 +7,11 @@
 package di
 
 import (
-	"context"
 	"gin-starter/internal/controller"
 	"gin-starter/internal/controller/health"
 	"gin-starter/internal/singleton/config"
-	"gin-starter/internal/singleton/intergrations/amazon"
+	"gin-starter/internal/singleton/integration"
+	"gin-starter/internal/singleton/integration/amazon"
 	"github.com/google/wire"
 )
 
@@ -39,16 +39,30 @@ func ProvideAppConfig() (*config.AppConfig, error) {
 	return appConfig, nil
 }
 
+func ProvideIntegration() (*integration.Integration, error) {
+	envConfig := config.ParseEnvironment()
+	awsConfig := config.ConfigureAws()
+	processConfig, err := config.NewProcessConfig(envConfig)
+	if err != nil {
+		return nil, err
+	}
+	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
+	client := amazon.NewDynamoDBClient(appConfig)
+	cognitoidentityproviderClient := amazon.NewCidpClient(appConfig)
+	amazonIntegration := amazon.NewAmazonIntegration(client, cognitoidentityproviderClient)
+	integrationIntegration, err := integration.NewIntegration(amazonIntegration)
+	if err != nil {
+		return nil, err
+	}
+	return integrationIntegration, nil
+}
+
 // wire.go:
-
-var appContext context.Context = nil
-
-var appCancel context.CancelCauseFunc = nil
 
 var configSet = wire.NewSet(config.ParseEnvironment, config.ConfigureAws, config.NewProcessConfig, config.NewAppConfig)
 
-var intergrationSet = wire.NewSet(
-	configSet, amazon.NewDynamoDBClient,
+var integrationSet = wire.NewSet(
+	configSet, amazon.NewDynamoDBClient, amazon.NewCidpClient, amazon.NewAmazonIntegration, integration.NewIntegration,
 )
 
 var healthControllerSet = wire.NewSet(health.NewHealthController)

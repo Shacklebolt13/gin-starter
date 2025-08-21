@@ -3,17 +3,14 @@
 package di
 
 import (
-	"context"
 	"gin-starter/internal/controller"
 	"gin-starter/internal/controller/health"
 	"gin-starter/internal/singleton/config"
-	"gin-starter/internal/singleton/intergrations/amazon"
+	"gin-starter/internal/singleton/integration"
+	"gin-starter/internal/singleton/integration/amazon"
 
 	"github.com/google/wire"
 )
-
-var appContext context.Context = nil
-var appCancel context.CancelCauseFunc = nil
 
 var configSet = wire.NewSet(
 	config.ParseEnvironment,
@@ -22,9 +19,12 @@ var configSet = wire.NewSet(
 	config.NewAppConfig,
 )
 
-var intergrationSet = wire.NewSet(
+var integrationSet = wire.NewSet(
 	configSet,
 	amazon.NewDynamoDBClient,
+	amazon.NewCidpClient,
+	amazon.NewAmazonIntegration,
+	integration.NewIntegration,
 )
 
 var healthControllerSet = wire.NewSet(
@@ -48,5 +48,10 @@ func ProvideUrlMappings() controller.UrlMapping {
 
 func ProvideAppConfig() (*config.AppConfig, error) {
 	wire.Build(configSet)
+	return nil, nil
+}
+
+func ProvideIntegration() (*integration.Integration, error) {
+	wire.Build(integrationSet)
 	return nil, nil
 }

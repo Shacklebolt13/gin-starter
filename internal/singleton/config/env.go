@@ -1,6 +1,8 @@
 package config
 
 import (
+	"sync"
+
 	"github.com/caarlos0/env/v11"
 	"github.com/rs/zerolog/log"
 )
@@ -14,11 +16,15 @@ type EnvConfig struct {
 	LOG_LEVEL   string `env:"LOG_LEVEL" envDefault:"info"`
 }
 
+var envConfig EnvConfig
+var envOnce sync.Once
+
 func ParseEnvironment() *EnvConfig {
-	envConfig := EnvConfig{}
-	err := env.Parse(&envConfig)
-	if err != nil {
-		log.Fatal().Err(err).Send()
-	}
+	envOnce.Do(func() {
+		err := env.Parse(&envConfig)
+		if err != nil {
+			log.Fatal().Err(err).Send()
+		}
+	})
 	return &envConfig
 }
