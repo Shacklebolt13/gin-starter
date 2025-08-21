@@ -5,6 +5,9 @@ package di
 import (
 	"gin-starter/internal/controller"
 	"gin-starter/internal/controller/health"
+	"gin-starter/internal/service/integration/amazon/cognito"
+	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
+	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/login"
 	"gin-starter/internal/singleton/config"
 	"gin-starter/internal/singleton/integration"
 	"gin-starter/internal/singleton/integration/amazon"
@@ -19,12 +22,17 @@ var configSet = wire.NewSet(
 	config.NewAppConfig,
 )
 
-var integrationSet = wire.NewSet(
-	configSet,
+var integrationConfigSet = wire.NewSet(
 	amazon.NewDynamoDBClient,
 	amazon.NewCidpClient,
 	amazon.NewAmazonIntegration,
 	integration.NewIntegration,
+)
+
+var cognitoSet = wire.NewSet(
+	login.NewLoginService,
+	create.NewCreateUserService,
+	cognito.NewCognitoService,
 )
 
 var healthControllerSet = wire.NewSet(
@@ -51,7 +59,12 @@ func ProvideAppConfig() (*config.AppConfig, error) {
 	return nil, nil
 }
 
-func ProvideIntegration() (*integration.Integration, error) {
-	wire.Build(integrationSet)
+func ProvideIntegrationConfig() (*integration.ExternalClients, error) {
+	wire.Build(configSet, integrationConfigSet)
+	return nil, nil
+}
+
+func ProvideCognitoService() (*cognito.CognitoService, error) {
+	wire.Build(configSet, integrationConfigSet, cognitoSet)
 	return nil, nil
 }

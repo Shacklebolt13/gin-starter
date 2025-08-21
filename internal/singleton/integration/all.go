@@ -6,15 +6,15 @@ import (
 )
 
 var onceIntegration sync.Once
-var integration *Integration
+var integration *ExternalClients
 
-type Integration struct {
+type ExternalClients struct {
 	Amz *amazon.AmazonIntegration
 }
 
-func NewIntegration(amz *amazon.AmazonIntegration) (*Integration, error) {
+func NewIntegration(amz *amazon.AmazonIntegration) (*ExternalClients, error) {
 	onceIntegration.Do(func() {
-		integration = &Integration{
+		integration = &ExternalClients{
 			Amz: amz,
 		}
 	})

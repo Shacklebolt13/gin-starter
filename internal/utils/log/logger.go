@@ -1,8 +1,6 @@
 package log
 
 import (
-	"gin-starter/di"
-	"gin-starter/internal/utils"
 	"os"
 	"sync"
 
@@ -13,9 +11,8 @@ var logger zlog.Logger
 var once sync.Once
 
 func Init() {
-	appConfig := utils.Fatal(di.ProvideAppConfig())
 	logger = zlog.New(os.Stdout).With().Timestamp().
-		Caller().Ctx(appConfig.Process.Ctx).Stack().Logger()
+		Caller().Stack().Logger()
 }
 
 func Info() *zlog.Event {

@@ -9,6 +9,9 @@ package di
 import (
 	"gin-starter/internal/controller"
 	"gin-starter/internal/controller/health"
+	"gin-starter/internal/service/integration/amazon/cognito"
+	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
+	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/login"
 	"gin-starter/internal/singleton/config"
 	"gin-starter/internal/singleton/integration"
 	"gin-starter/internal/singleton/integration/amazon"
@@ -39,7 +42,7 @@ func ProvideAppConfig() (*config.AppConfig, error) {
 	return appConfig, nil
 }
 
-func ProvideIntegration() (*integration.Integration, error) {
+func ProvideIntegrationConfig() (*integration.ExternalClients, error) {
 	envConfig := config.ParseEnvironment()
 	awsConfig := config.ConfigureAws()
 	processConfig, err := config.NewProcessConfig(envConfig)
@@ -50,20 +53,38 @@ func ProvideIntegration() (*integration.Integration, error) {
 	client := amazon.NewDynamoDBClient(appConfig)
 	cognitoidentityproviderClient := amazon.NewCidpClient(appConfig)
 	amazonIntegration := amazon.NewAmazonIntegration(client, cognitoidentityproviderClient)
-	integrationIntegration, err := integration.NewIntegration(amazonIntegration)
+	externalClients, err := integration.NewIntegration(amazonIntegration)
 	if err != nil {
 		return nil, err
 	}
-	return integrationIntegration, nil
+	return externalClients, nil
+}
+
+func ProvideCognitoService() (*cognito.CognitoService, error) {
+	envConfig := config.ParseEnvironment()
+	awsConfig := config.ConfigureAws()
+	processConfig, err := config.NewProcessConfig(envConfig)
+	if err != nil {
+		return nil, err
+	}
+	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
+	client := amazon.NewCidpClient(appConfig)
+	createUserService := create.NewCreateUserService(client, appConfig, awsConfig)
+	loginService := login.NewLoginService(client)
+	cognitoService, err := cognito.NewCognitoService(createUserService, loginService)
+	if err != nil {
+		return nil, err
+	}
+	return cognitoService, nil
 }
 
 // wire.go:
 
 var configSet = wire.NewSet(config.ParseEnvironment, config.ConfigureAws, config.NewProcessConfig, config.NewAppConfig)
 
-var integrationSet = wire.NewSet(
-	configSet, amazon.NewDynamoDBClient, amazon.NewCidpClient, amazon.NewAmazonIntegration, integration.NewIntegration,
-)
+var integrationConfigSet = wire.NewSet(amazon.NewDynamoDBClient, amazon.NewCidpClient, amazon.NewAmazonIntegration, integration.NewIntegration)
+
+var cognitoSet = wire.NewSet(login.NewLoginService, create.NewCreateUserService, cognito.NewCognitoService)
 
 var healthControllerSet = wire.NewSet(health.NewHealthController)
 
