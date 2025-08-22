@@ -11,8 +11,8 @@ else
 	EXT = ""
 endif
 
-.PHONY: clean di lint build-api build dev-nt
-all : di lint build-api build
+.PHONY: tidy clean di lint build-api build dev-nt
+all : tidy di lint build-api build
 
 clean:
 	@echo Cleaning directories...
@@ -21,6 +21,9 @@ di:
 	@echo "Injecting Dependencies"
 	@cd $(MAKEFILE_DIR) && go install github.com/google/wire/cmd/wire@latest
 	@cd $(MAKEFILE_DIR) && wire ./di
+
+tidy:
+	@cd $(MAKEFILE_DIR) && go mod tidy
 
 lint:
 	@echo "Linting Modules"

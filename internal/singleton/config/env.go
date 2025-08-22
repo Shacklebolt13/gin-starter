@@ -13,6 +13,8 @@ type EnvConfig struct {
 	SQL_DB_USER string `env:"SQL_DB_USER" envDefault:"postgres"`
 	SQL_DB_PASS string `env:"SQL_DB_PASS" envDefault:"password"`
 
+	SQLITE_PATH string `env:"SQLITE_PATH" envDefault:"sqlite.db"`
+
 	PORT      int32  `env:"PORT" envDefault:"8000"`
 	LOG_LEVEL string `env:"LOG_LEVEL" envDefault:"info"`
 
