@@ -8,8 +8,8 @@ type UserService struct {
 	Create create.CreateUserService
 }
 
-func NewUserService(create create.CreateUserService) (*UserService, error) {
+func NewUserService(create create.CreateUserService) *UserService {
 	return &UserService{
 		Create: create,
-	}, nil
+	}
 }

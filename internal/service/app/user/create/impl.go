@@ -44,9 +44,9 @@ func (svc *createUserServiceImpl) RegisterUserByPassword(ctx context.Context, re
 	}, nil
 }
 
-func NewCreateUserService(cognito *cognito.CognitoService, usrRepo repo.UserRepository) (CreateUserService, error) {
+func NewCreateUserService(cognito *cognito.CognitoService, usrRepo repo.UserRepository) CreateUserService {
 	return &createUserServiceImpl{
 		cognito: *cognito,
 		usrRepo: usrRepo,
-	}, nil
+	}
 }

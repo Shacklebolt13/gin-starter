@@ -10,9 +10,9 @@ type CognitoService struct {
 	Login  login.LoginService
 }
 
-func NewCognitoService(cr create.CreateUserService, lo login.LoginService) (*CognitoService, error) {
+func NewCognitoService(cr create.CreateUserService, lo login.LoginService) *CognitoService {
 	return &CognitoService{
 		Create: cr,
 		Login:  lo,
-	}, nil
+	}
 }

@@ -17,6 +17,7 @@ type EnvConfig struct {
 
 	PORT      int32  `env:"PORT" envDefault:"8000"`
 	LOG_LEVEL string `env:"LOG_LEVEL" envDefault:"info"`
+	GIN_MODE  string `env:"GIN_MODE" envDefault:"release"`
 
 	COGNITO_POOL_ID   string `env:"COGNITO_POOL_ID" envDefault:""`
 	COGNITO_CLIENT_ID string `env:"COGNITO_CLIENT_ID" envDefault:""`

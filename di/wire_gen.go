@@ -9,9 +9,10 @@ package di
 import (
 	"gin-starter/internal/controller"
 	"gin-starter/internal/controller/health"
+	"gin-starter/internal/controller/user"
 	"gin-starter/internal/database/sql"
 	"gin-starter/internal/database/sql/repo"
-	"gin-starter/internal/service/app/user"
+	user2 "gin-starter/internal/service/app/user"
 	create2 "gin-starter/internal/service/app/user/create"
 	"gin-starter/internal/service/integration/amazon/cognito"
 	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
@@ -29,19 +30,46 @@ func ProvideHealthController() (health.HealthController, error) {
 	return healthController, nil
 }
 
+func ProvideUserController() (user.UserController, error) {
+	envConfig := config.ParseEnvironment()
+	awsConfig := config.ConfigureAws()
+	processConfig := config.NewProcessConfig(envConfig)
+	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
+	client := amazon.NewCidpClient(appConfig)
+	createUserService := create.NewCreateUserService(client, appConfig, awsConfig)
+	loginService := login.NewLoginService(client)
+	cognitoService := cognito.NewCognitoService(createUserService, loginService)
+	db := sql.ConnectDb(appConfig)
+	userRepository := repo.NewUserRepository(db)
+	createCreateUserService := create2.NewCreateUserService(cognitoService, userRepository)
+	userService := user2.NewUserService(createCreateUserService)
+	userController := user.NewUserController(userService)
+	return userController, nil
+}
+
 func ProvideUrlMappings() controller.UrlMapping {
 	healthController := health.NewHealthController()
-	urlMapping := controller.NewUrlMapping(healthController)
+	envConfig := config.ParseEnvironment()
+	awsConfig := config.ConfigureAws()
+	processConfig := config.NewProcessConfig(envConfig)
+	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
+	client := amazon.NewCidpClient(appConfig)
+	createUserService := create.NewCreateUserService(client, appConfig, awsConfig)
+	loginService := login.NewLoginService(client)
+	cognitoService := cognito.NewCognitoService(createUserService, loginService)
+	db := sql.ConnectDb(appConfig)
+	userRepository := repo.NewUserRepository(db)
+	createCreateUserService := create2.NewCreateUserService(cognitoService, userRepository)
+	userService := user2.NewUserService(createCreateUserService)
+	userController := user.NewUserController(userService)
+	urlMapping := controller.NewUrlMapping(healthController, userController)
 	return urlMapping
 }
 
 func ProvideAppConfig() (*config.AppConfig, error) {
 	envConfig := config.ParseEnvironment()
 	awsConfig := config.ConfigureAws()
-	processConfig, err := config.NewProcessConfig(envConfig)
-	if err != nil {
-		return nil, err
-	}
+	processConfig := config.NewProcessConfig(envConfig)
 	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
 	return appConfig, nil
 }
@@ -49,64 +77,40 @@ func ProvideAppConfig() (*config.AppConfig, error) {
 func ProvideIntegrationConfig() (*integration.ExternalClients, error) {
 	envConfig := config.ParseEnvironment()
 	awsConfig := config.ConfigureAws()
-	processConfig, err := config.NewProcessConfig(envConfig)
-	if err != nil {
-		return nil, err
-	}
+	processConfig := config.NewProcessConfig(envConfig)
 	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
 	client := amazon.NewDynamoDBClient(appConfig)
 	cognitoidentityproviderClient := amazon.NewCidpClient(appConfig)
 	amazonIntegration := amazon.NewAmazonIntegration(client, cognitoidentityproviderClient)
-	externalClients, err := integration.NewIntegration(amazonIntegration)
-	if err != nil {
-		return nil, err
-	}
+	externalClients := integration.NewIntegration(amazonIntegration)
 	return externalClients, nil
 }
 
 func ProvideCognitoService() (*cognito.CognitoService, error) {
 	envConfig := config.ParseEnvironment()
 	awsConfig := config.ConfigureAws()
-	processConfig, err := config.NewProcessConfig(envConfig)
-	if err != nil {
-		return nil, err
-	}
+	processConfig := config.NewProcessConfig(envConfig)
 	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
 	client := amazon.NewCidpClient(appConfig)
 	createUserService := create.NewCreateUserService(client, appConfig, awsConfig)
 	loginService := login.NewLoginService(client)
-	cognitoService, err := cognito.NewCognitoService(createUserService, loginService)
-	if err != nil {
-		return nil, err
-	}
+	cognitoService := cognito.NewCognitoService(createUserService, loginService)
 	return cognitoService, nil
 }
 
-func ProvideUserService() (*user.UserService, error) {
+func ProvideUserService() (*user2.UserService, error) {
 	envConfig := config.ParseEnvironment()
 	awsConfig := config.ConfigureAws()
-	processConfig, err := config.NewProcessConfig(envConfig)
-	if err != nil {
-		return nil, err
-	}
+	processConfig := config.NewProcessConfig(envConfig)
 	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
 	client := amazon.NewCidpClient(appConfig)
 	createUserService := create.NewCreateUserService(client, appConfig, awsConfig)
 	loginService := login.NewLoginService(client)
-	cognitoService, err := cognito.NewCognitoService(createUserService, loginService)
-	if err != nil {
-		return nil, err
-	}
+	cognitoService := cognito.NewCognitoService(createUserService, loginService)
 	db := sql.ConnectDb(appConfig)
 	userRepository := repo.NewUserRepository(db)
-	createCreateUserService, err := create2.NewCreateUserService(cognitoService, userRepository)
-	if err != nil {
-		return nil, err
-	}
-	userService, err := user.NewUserService(createCreateUserService)
-	if err != nil {
-		return nil, err
-	}
+	createCreateUserService := create2.NewCreateUserService(cognitoService, userRepository)
+	userService := user2.NewUserService(createCreateUserService)
 	return userService, nil
 }
 
@@ -118,12 +122,17 @@ var integrationConfigSet = wire.NewSet(amazon.NewDynamoDBClient, amazon.NewCidpC
 
 var databaseSet = wire.NewSet(sql.ConnectDb, repo.NewUserRepository)
 
-var userServiceSet = wire.NewSet(create2.NewCreateUserService, user.NewUserService)
+var userServiceSet = wire.NewSet(create2.NewCreateUserService, user2.NewUserService)
 
 var cognitoSet = wire.NewSet(login.NewLoginService, create.NewCreateUserService, cognito.NewCognitoService)
 
-var healthControllerSet = wire.NewSet(health.NewHealthController)
+var controllerSet = wire.NewSet(health.NewHealthController, user.NewUserController, controller.NewUrlMapping)
 
-var controllerSet = wire.NewSet(
-	healthControllerSet, controller.NewUrlMapping,
+var megaSet = wire.NewSet(
+	configSet,
+	integrationConfigSet,
+	databaseSet,
+	userServiceSet,
+	cognitoSet,
+	controllerSet,
 )

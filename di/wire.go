@@ -5,6 +5,7 @@ package di
 import (
 	"gin-starter/internal/controller"
 	"gin-starter/internal/controller/health"
+	user_ctrl "gin-starter/internal/controller/user"
 	"gin-starter/internal/database/sql"
 	"gin-starter/internal/database/sql/repo"
 	app_user "gin-starter/internal/service/app/user"
@@ -49,41 +50,52 @@ var cognitoSet = wire.NewSet(
 	cognito.NewCognitoService,
 )
 
-var healthControllerSet = wire.NewSet(
-	health.NewHealthController,
-)
-
 var controllerSet = wire.NewSet(
-	healthControllerSet,
+	health.NewHealthController,
+	user_ctrl.NewUserController,
 	controller.NewUrlMapping,
 )
 
+var megaSet = wire.NewSet(
+	configSet,
+	integrationConfigSet,
+	databaseSet,
+	userServiceSet,
+	cognitoSet,
+	controllerSet,
+)
+
 func ProvideHealthController() (health.HealthController, error) {
-	wire.Build(healthControllerSet)
+	wire.Build(megaSet)
+	return nil, nil
+}
+
+func ProvideUserController() (user_ctrl.UserController, error) {
+	wire.Build(megaSet)
 	return nil, nil
 }
 
 func ProvideUrlMappings() controller.UrlMapping {
-	wire.Build(controllerSet)
+	wire.Build(megaSet)
 	return nil
 }
 
 func ProvideAppConfig() (*config.AppConfig, error) {
-	wire.Build(configSet)
+	wire.Build(megaSet)
 	return nil, nil
 }
 
 func ProvideIntegrationConfig() (*integration.ExternalClients, error) {
-	wire.Build(configSet, integrationConfigSet)
+	wire.Build(megaSet)
 	return nil, nil
 }
 
 func ProvideCognitoService() (*cognito.CognitoService, error) {
-	wire.Build(configSet, integrationConfigSet, cognitoSet)
+	wire.Build(megaSet)
 	return nil, nil
 }
 
 func ProvideUserService() (*app_user.UserService, error) {
-	wire.Build(configSet, databaseSet, integrationConfigSet, cognitoSet, userServiceSet)
+	wire.Build(megaSet)
 	return nil, nil
 }

@@ -12,12 +12,12 @@ type ExternalClients struct {
 	Amz *amazon.AmazonIntegration
 }
 
-func NewIntegration(amz *amazon.AmazonIntegration) (*ExternalClients, error) {
+func NewIntegration(amz *amazon.AmazonIntegration) *ExternalClients {
 	onceIntegration.Do(func() {
 		integration = &ExternalClients{
 			Amz: amz,
 		}
 	})
 
-	return integration, nil
+	return integration
 }
