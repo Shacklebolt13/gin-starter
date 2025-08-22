@@ -3,7 +3,6 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -28,7 +27,7 @@ type BaseModelIntPk struct {
 	BaseModel
 }
 
-type BaseModelUuidPk struct {
-	ID uuid.UUID `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id"`
+type BaseModelStringPk struct {
+	ID string `gorm:"primaryKey;column:id"`
 	BaseModel
 }

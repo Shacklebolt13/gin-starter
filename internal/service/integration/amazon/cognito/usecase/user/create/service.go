@@ -15,10 +15,10 @@ type createUserServiceImpl struct {
 	aws    *aws.Config
 }
 
-func (svc *createUserServiceImpl) RegisterUserWithPassword(ctx context.Context, request CreateUserRequest) error {
+func (svc *createUserServiceImpl) RegisterUserWithPassword(ctx context.Context, request CreateUserRequest) (*CreateUserResult, error) {
 	if err := request.Validate(); err != nil {
-		log.Error().Err(err).Msg("validation failed for CreateUserRequest")
-		return err
+		log.Error().Err(err).Msg("validation failed for Registering User By password on cognito")
+		return nil, err
 	}
 
 	signUpInput := cidp.SignUpInput{
@@ -27,13 +27,15 @@ func (svc *createUserServiceImpl) RegisterUserWithPassword(ctx context.Context, 
 		Password: aws.String(request.Password),
 	}
 
-	_, err := svc.client.SignUp(ctx, &signUpInput)
+	out, err := svc.client.SignUp(ctx, &signUpInput)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to sign up user")
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &CreateUserResult{
+		UserSub: *out.UserSub,
+	}, nil
 }
 
 func NewCreateUserService(client *cidp.Client, cfg *config.AppConfig, awsCfg *aws.Config) CreateUserService {

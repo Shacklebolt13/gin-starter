@@ -5,9 +5,13 @@ package di
 import (
 	"gin-starter/internal/controller"
 	"gin-starter/internal/controller/health"
+	"gin-starter/internal/database/sql"
+	"gin-starter/internal/database/sql/repo"
+	app_user "gin-starter/internal/service/app/user"
+	app_create "gin-starter/internal/service/app/user/create"
 	"gin-starter/internal/service/integration/amazon/cognito"
-	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
-	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/login"
+	cognito_create "gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
+	user_login "gin-starter/internal/service/integration/amazon/cognito/usecase/user/login"
 	"gin-starter/internal/singleton/config"
 	"gin-starter/internal/singleton/integration"
 	"gin-starter/internal/singleton/integration/amazon"
@@ -29,9 +33,19 @@ var integrationConfigSet = wire.NewSet(
 	integration.NewIntegration,
 )
 
+var databaseSet = wire.NewSet(
+	sql.ConnectDb,
+	repo.NewUserRepository,
+)
+
+var userServiceSet = wire.NewSet(
+	app_create.NewCreateUserService,
+	app_user.NewUserService,
+)
+
 var cognitoSet = wire.NewSet(
-	login.NewLoginService,
-	create.NewCreateUserService,
+	user_login.NewLoginService,
+	cognito_create.NewCreateUserService,
 	cognito.NewCognitoService,
 )
 
@@ -66,5 +80,10 @@ func ProvideIntegrationConfig() (*integration.ExternalClients, error) {
 
 func ProvideCognitoService() (*cognito.CognitoService, error) {
 	wire.Build(configSet, integrationConfigSet, cognitoSet)
+	return nil, nil
+}
+
+func ProvideUserService() (*app_user.UserService, error) {
+	wire.Build(configSet, databaseSet, integrationConfigSet, cognitoSet, userServiceSet)
 	return nil, nil
 }

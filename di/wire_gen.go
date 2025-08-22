@@ -9,6 +9,10 @@ package di
 import (
 	"gin-starter/internal/controller"
 	"gin-starter/internal/controller/health"
+	"gin-starter/internal/database/sql"
+	"gin-starter/internal/database/sql/repo"
+	"gin-starter/internal/service/app/user"
+	create2 "gin-starter/internal/service/app/user/create"
 	"gin-starter/internal/service/integration/amazon/cognito"
 	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
 	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/login"
@@ -78,11 +82,43 @@ func ProvideCognitoService() (*cognito.CognitoService, error) {
 	return cognitoService, nil
 }
 
+func ProvideUserService() (*user.UserService, error) {
+	envConfig := config.ParseEnvironment()
+	awsConfig := config.ConfigureAws()
+	processConfig, err := config.NewProcessConfig(envConfig)
+	if err != nil {
+		return nil, err
+	}
+	appConfig := config.NewAppConfig(envConfig, awsConfig, processConfig)
+	client := amazon.NewCidpClient(appConfig)
+	createUserService := create.NewCreateUserService(client, appConfig, awsConfig)
+	loginService := login.NewLoginService(client)
+	cognitoService, err := cognito.NewCognitoService(createUserService, loginService)
+	if err != nil {
+		return nil, err
+	}
+	db := sql.ConnectDb(appConfig)
+	userRepository := repo.NewUserRepository(db)
+	createCreateUserService, err := create2.NewCreateUserService(cognitoService, userRepository)
+	if err != nil {
+		return nil, err
+	}
+	userService, err := user.NewUserService(createCreateUserService)
+	if err != nil {
+		return nil, err
+	}
+	return userService, nil
+}
+
 // wire.go:
 
 var configSet = wire.NewSet(config.ParseEnvironment, config.ConfigureAws, config.NewProcessConfig, config.NewAppConfig)
 
 var integrationConfigSet = wire.NewSet(amazon.NewDynamoDBClient, amazon.NewCidpClient, amazon.NewAmazonIntegration, integration.NewIntegration)
+
+var databaseSet = wire.NewSet(sql.ConnectDb, repo.NewUserRepository)
+
+var userServiceSet = wire.NewSet(create2.NewCreateUserService, user.NewUserService)
 
 var cognitoSet = wire.NewSet(login.NewLoginService, create.NewCreateUserService, cognito.NewCognitoService)
 
