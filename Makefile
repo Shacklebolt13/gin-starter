@@ -18,20 +18,20 @@ clean:
 	@echo Cleaning directories...
 	@cd $(MAKEFILE_DIR) && $(RM) $(OUTPUT_DIR)
 di:
-	@echo "Injecting Dependencies"
-	@cd $(MAKEFILE_DIR) && go install github.com/google/wire/cmd/wire@latest
-	@cd $(MAKEFILE_DIR) && wire ./di
+	@echo Injecting Dependencies
+	@go install github.com/google/wire/cmd/wire@latest
+	@cd $(MAKEFILE_DIR) && wire gen ./di
 
 tidy:
 	@cd $(MAKEFILE_DIR) && go mod tidy
 
 lint:
-	@echo "Linting Modules"
-	@cd $(MAKEFILE_DIR) && go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
-	@cd $(MAKEFILE_DIR) && golangci-lint run
+	@echo Linting Modules
+	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+	@cd $(MAKEFILE_DIR) && golangci-lint-v2 run ./...
 
 build-api:
-	@echo "Building Api executable"
+	@echo Building Api executable
 	@cd $(MAKEFILE_DIR) && go build -o out/api$(EXT) ./cmd/api
 
 build: di lint build-api

@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "artifacts",
-        "configuration"
+        "configuration",
+        "runtime"
     ]
 }
