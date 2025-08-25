@@ -3,10 +3,10 @@ package user
 import (
 	"gin-starter/internal/service/app/user"
 	"gin-starter/internal/service/app/user/create"
+	"gin-starter/internal/service/app/user/login"
 	"gin-starter/internal/utils/errs"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 type userControllerImpl struct {
@@ -16,24 +16,43 @@ type userControllerImpl struct {
 func (u *userControllerImpl) RegisterUserByPassword(c *gin.Context) {
 	var request create.CreateUserByPasswordRequest
 	if err := c.BindJSON(&request); err != nil {
-		errMap := make(map[string]string)
-		for _, e := range err.(validator.ValidationErrors) {
-			errMap[e.Field()] = e.Tag()
-		}
-
+		e := err.(errs.ValidationErr)
 		c.JSON(400, errs.Incident{
 			Type:    errs.RequestValidationError,
-			Message: "Invalid request format",
-			Detail:  errMap,
+			Message: e.Error(),
+			Detail:  e.Map(),
 		})
 	}
 
 	result, err := u.uSvc.Create.RegisterUserByPassword(c.Request.Context(), request)
 	if err == nil {
 		c.JSON(200, errs.Incident{
-			Type:    errs.Success,
-			Message: "User registered successfully",
-			Detail:  result,
+			Type:   errs.Success,
+			Detail: result,
+		})
+	}
+
+	if inc, ok := err.(*errs.Incident); ok {
+		c.JSON(int(inc.Type), inc)
+	}
+}
+
+func (u *userControllerImpl) LoginByPassword(c *gin.Context) {
+	var request login.LoginByPasswordRequest
+	if err := c.BindJSON(&request); err != nil {
+		e := err.(errs.ValidationErr)
+		c.JSON(400, errs.Incident{
+			Type:    errs.RequestValidationError,
+			Message: e.Error(),
+			Detail:  e.Map(),
+		})
+	}
+
+	result, err := u.uSvc.Login.LoginByPassword(c.Request.Context(), request)
+	if err == nil {
+		c.JSON(200, errs.Incident{
+			Type:   errs.Success,
+			Detail: result,
 		})
 	}
 

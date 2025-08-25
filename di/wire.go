@@ -10,9 +10,10 @@ import (
 	"gin-starter/internal/database/sql/repo"
 	app_user "gin-starter/internal/service/app/user"
 	app_create "gin-starter/internal/service/app/user/create"
+	user_login "gin-starter/internal/service/app/user/login"
 	"gin-starter/internal/service/integration/amazon/cognito"
 	cognito_create "gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
-	user_login "gin-starter/internal/service/integration/amazon/cognito/usecase/user/login"
+	cognito_login "gin-starter/internal/service/integration/amazon/cognito/usecase/user/login"
 	"gin-starter/internal/singleton/config"
 	"gin-starter/internal/singleton/integration"
 	"gin-starter/internal/singleton/integration/amazon"
@@ -41,11 +42,12 @@ var databaseSet = wire.NewSet(
 
 var userServiceSet = wire.NewSet(
 	app_create.NewCreateUserService,
+	user_login.NewLoginUserService,
 	app_user.NewUserService,
 )
 
 var cognitoSet = wire.NewSet(
-	user_login.NewLoginService,
+	cognito_login.NewLoginService,
 	cognito_create.NewCreateUserService,
 	cognito.NewCognitoService,
 )

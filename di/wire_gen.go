@@ -14,6 +14,7 @@ import (
 	"gin-starter/internal/database/sql/repo"
 	user2 "gin-starter/internal/service/app/user"
 	create2 "gin-starter/internal/service/app/user/create"
+	login2 "gin-starter/internal/service/app/user/login"
 	"gin-starter/internal/service/integration/amazon/cognito"
 	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
 	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/login"
@@ -42,7 +43,8 @@ func ProvideUserController() (user.UserController, error) {
 	db := sql.ConnectDb(appConfig)
 	userRepository := repo.NewUserRepository(db)
 	createCreateUserService := create2.NewCreateUserService(cognitoService, userRepository)
-	userService := user2.NewUserService(createCreateUserService)
+	loginUserService := login2.NewLoginUserService(cognitoService, userRepository)
+	userService := user2.NewUserService(createCreateUserService, loginUserService)
 	userController := user.NewUserController(userService)
 	return userController, nil
 }
@@ -60,7 +62,8 @@ func ProvideUrlMappings() controller.UrlMapping {
 	db := sql.ConnectDb(appConfig)
 	userRepository := repo.NewUserRepository(db)
 	createCreateUserService := create2.NewCreateUserService(cognitoService, userRepository)
-	userService := user2.NewUserService(createCreateUserService)
+	loginUserService := login2.NewLoginUserService(cognitoService, userRepository)
+	userService := user2.NewUserService(createCreateUserService, loginUserService)
 	userController := user.NewUserController(userService)
 	urlMapping := controller.NewUrlMapping(healthController, userController)
 	return urlMapping
@@ -110,7 +113,8 @@ func ProvideUserService() (*user2.UserService, error) {
 	db := sql.ConnectDb(appConfig)
 	userRepository := repo.NewUserRepository(db)
 	createCreateUserService := create2.NewCreateUserService(cognitoService, userRepository)
-	userService := user2.NewUserService(createCreateUserService)
+	loginUserService := login2.NewLoginUserService(cognitoService, userRepository)
+	userService := user2.NewUserService(createCreateUserService, loginUserService)
 	return userService, nil
 }
 
@@ -122,7 +126,7 @@ var integrationConfigSet = wire.NewSet(amazon.NewDynamoDBClient, amazon.NewCidpC
 
 var databaseSet = wire.NewSet(sql.ConnectDb, repo.NewUserRepository)
 
-var userServiceSet = wire.NewSet(create2.NewCreateUserService, user2.NewUserService)
+var userServiceSet = wire.NewSet(create2.NewCreateUserService, login2.NewLoginUserService, user2.NewUserService)
 
 var cognitoSet = wire.NewSet(login.NewLoginService, create.NewCreateUserService, cognito.NewCognitoService)
 

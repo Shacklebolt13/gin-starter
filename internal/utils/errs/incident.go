@@ -12,6 +12,7 @@ const (
 	DatabaseError          IncidentType = http.StatusInternalServerError
 	NotFoundError          IncidentType = http.StatusNotFound
 	RequestValidationError IncidentType = http.StatusBadRequest
+	AuthenticationError    IncidentType = http.StatusUnauthorized
 	Redirect               IncidentType = http.StatusMovedPermanently
 	Success                IncidentType = http.StatusOK
 )

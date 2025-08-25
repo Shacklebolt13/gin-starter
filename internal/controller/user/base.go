@@ -9,4 +9,5 @@ import (
 type UserController interface {
 	generic.Controller
 	RegisterUserByPassword(c *gin.Context)
+	LoginByPassword(c *gin.Context)
 }
