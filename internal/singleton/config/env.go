@@ -19,8 +19,9 @@ type EnvConfig struct {
 	LOG_LEVEL string `env:"LOG_LEVEL" envDefault:"info"`
 	GIN_MODE  string `env:"GIN_MODE" envDefault:"release"`
 
-	COGNITO_POOL_ID   string `env:"COGNITO_POOL_ID" envDefault:""`
-	COGNITO_CLIENT_ID string `env:"COGNITO_CLIENT_ID" envDefault:""`
+	COGNITO_POOL_ID       string `env:"COGNITO_POOL_ID" envDefault:""`
+	COGNITO_CLIENT_ID     string `env:"COGNITO_CLIENT_ID" envDefault:""`
+	COGNITO_CLIENT_SECRET string `env:"COGNITO_CLIENT_SECRET" envDefault:""`
 }
 
 var envConfig EnvConfig

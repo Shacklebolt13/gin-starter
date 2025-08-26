@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title Gin Starter API
+// @version 1.0.
 func main() {
 	engine := gin.Default()
 	appConfig := errs.Fatal(di.ProvideAppConfig())

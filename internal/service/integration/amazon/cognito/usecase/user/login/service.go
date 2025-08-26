@@ -2,6 +2,8 @@ package login
 
 import (
 	"context"
+	"gin-starter/internal/singleton/config"
+	"gin-starter/internal/utils/crypto"
 	"gin-starter/internal/utils/log"
 
 	cidp "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
@@ -10,14 +12,26 @@ import (
 
 type loginServiceImpl struct {
 	client *cidp.Client
+	cfg    *config.AppConfig
 }
 
 func (svc *loginServiceImpl) LoginByPassword(ctx context.Context, request LoginByPasswordRequest) (*LoginByPasswordResult, error) {
+	hash, err := crypto.SecretHash(
+		request.Email,
+		svc.cfg.Env.COGNITO_CLIENT_ID,
+		svc.cfg.Env.COGNITO_CLIENT_SECRET)
+	if err != nil {
+		return nil, err
+	}
+
 	authInput := cidp.InitiateAuthInput{
 		AuthFlow: types.AuthFlowTypeUserPasswordAuth,
+		ClientId: &svc.cfg.Env.COGNITO_CLIENT_ID,
+
 		AuthParameters: map[string]string{
-			"USERNAME": request.Email,
-			"PASSWORD": request.Password,
+			"USERNAME":    request.Email,
+			"PASSWORD":    request.Password,
+			"SECRET_HASH": hash,
 		},
 	}
 
@@ -34,8 +48,9 @@ func (svc *loginServiceImpl) LoginByPassword(ctx context.Context, request LoginB
 	}, nil
 }
 
-func NewLoginService(client *cidp.Client) LoginService {
+func NewLoginService(client *cidp.Client, cfg *config.AppConfig) LoginService {
 	return &loginServiceImpl{
 		client: client,
+		cfg:    cfg,
 	}
 }

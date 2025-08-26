@@ -6,6 +6,7 @@ import (
 	"gin-starter/internal/database/sql/repo"
 	"gin-starter/internal/service/integration/amazon/cognito"
 	"gin-starter/internal/service/integration/amazon/cognito/usecase/user/create"
+	"gin-starter/internal/utils/errs"
 )
 
 type createUserServiceImpl struct {
@@ -23,7 +24,11 @@ func (svc *createUserServiceImpl) RegisterUserByPassword(ctx context.Context, re
 		Password: req.Password,
 	})
 	if err != nil {
-		return nil, err
+		return nil, &errs.Incident{
+			Type:    errs.NotFoundError,
+			Message: err.Error(),
+			Err:     err,
+		}
 	}
 
 	user, err := svc.usrRepo.Create(ctx, model.User{
@@ -34,7 +39,11 @@ func (svc *createUserServiceImpl) RegisterUserByPassword(ctx context.Context, re
 		},
 	})
 	if err != nil {
-		return nil, err
+		return nil, &errs.Incident{
+			Type:    errs.DatabaseError,
+			Message: err.Error(),
+			Err:     err,
+		}
 	}
 
 	return &CreateUserByPasswordResult{

@@ -8,13 +8,14 @@ import (
 type IncidentType int
 
 const (
+	Success                IncidentType = http.StatusOK
+	Redirect               IncidentType = http.StatusMovedPermanently
+	RequestValidationError IncidentType = http.StatusBadRequest
+	BadAuthError           IncidentType = http.StatusUnauthorized
+	NotPermittedError      IncidentType = http.StatusForbidden
+	NotFoundError          IncidentType = http.StatusNotFound
 	InternalError          IncidentType = http.StatusInternalServerError
 	DatabaseError          IncidentType = http.StatusInternalServerError
-	NotFoundError          IncidentType = http.StatusNotFound
-	RequestValidationError IncidentType = http.StatusBadRequest
-	AuthenticationError    IncidentType = http.StatusUnauthorized
-	Redirect               IncidentType = http.StatusMovedPermanently
-	Success                IncidentType = http.StatusOK
 )
 
 type Incident struct {

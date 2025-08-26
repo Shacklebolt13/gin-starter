@@ -1,1 +1,4 @@
 out/
+sqlite.db
+.env
+__debug*

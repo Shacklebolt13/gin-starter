@@ -11,7 +11,11 @@ var logger zlog.Logger
 var once sync.Once
 
 func Init() {
-	logger = zlog.New(os.Stdout).With().Timestamp().
+	output := zlog.ConsoleWriter{
+		Out:     os.Stdout,
+		NoColor: false,
+	}
+	logger = zlog.New(output).With().Timestamp().
 		Caller().Stack().Logger()
 }
 

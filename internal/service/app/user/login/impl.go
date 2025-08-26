@@ -34,7 +34,7 @@ func (l *loginUserServiceImpl) LoginByPassword(ctx context.Context, request Logi
 	if err != nil {
 		return nil, &errs.Incident{
 			Err:     err,
-			Type:    errs.AuthenticationError,
+			Type:    errs.BadAuthError,
 			Message: err.Error(),
 		}
 	}

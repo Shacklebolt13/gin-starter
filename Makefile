@@ -11,8 +11,8 @@ else
 	EXT = ""
 endif
 
-.PHONY: tidy clean di lint build-api build dev-nt
-all : tidy di lint build-api build
+.PHONY: tidy clean di lint swag build-api build dev-nt
+all : tidy di lint build-api build swag
 
 clean:
 	@echo Cleaning directories...
@@ -21,6 +21,11 @@ di:
 	@echo Injecting Dependencies
 	@go install github.com/google/wire/cmd/wire@latest
 	@cd $(MAKEFILE_DIR) && wire gen ./di
+
+swag:
+	@echo Generating Swagger Docs
+	@go install github.com/swaggo/swag/cmd/swag@latest
+	@cd $(MAKEFILE_DIR) && swag init --dir cmd/api
 
 tidy:
 	@cd $(MAKEFILE_DIR) && go mod tidy
@@ -34,7 +39,7 @@ build-api:
 	@echo Building Api executable
 	@cd $(MAKEFILE_DIR) && go build -o out/api$(EXT) ./cmd/api
 
-build: di lint build-api
+build: di swag build-api
 
 dev: clean build-api
 ifeq ($(OS),Windows_NT)
