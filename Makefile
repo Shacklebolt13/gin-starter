@@ -23,10 +23,7 @@ di:
 	@cd $(MAKEFILE_DIR) && wire gen ./di
 
 swag:
-	@echo Generating Swagger Docs
-	@go install github.com/swaggo/swag/cmd/swag@latest
-	@cd $(MAKEFILE_DIR) && swag init --dir cmd/api
-
+	@swag init -g ../cmd/api/main.go -d ./internal
 tidy:
 	@cd $(MAKEFILE_DIR) && go mod tidy
 

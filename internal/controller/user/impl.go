@@ -77,7 +77,7 @@ func (u *userControllerImpl) RegisterUserByPassword(c *gin.Context) {
 // @Description Login a user with email and password
 // @Accept json
 // @Produce json
-// @Param request body login.LoginByPasswordRequest true "User login request"
+// @Request body login.LoginByPasswordRequest true "User login request"
 // @Success 200 {object} errs.Incident
 // @Failure 400 {object} errs.Incident
 // @Failure 404 {object} errs.Incident

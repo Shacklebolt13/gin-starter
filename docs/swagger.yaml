@@ -1,6 +1,100 @@
+definitions:
+  create.CreateUserByPasswordRequest:
+    properties:
+      email:
+        type: string
+      password:
+        maxLength: 128
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  errs.Incident:
+    properties:
+      detail: {}
+      message:
+        type: string
+      type:
+        type: integer
+    type: object
 info:
   contact: {}
   title: Gin Starter API
-  version: 1.0.
-paths: {}
+  version: 1.0.0.
+paths:
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Returns a 200 OK status if the service is healthy
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Checks if the service is healthy
+  /user/login/password:
+    post:
+      consumes:
+      - application/json
+      description: Login a user with email and password
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/errs.Incident'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Incident'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Incident'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errs.Incident'
+      summary: Login a user
+  /user/sign-up/password:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email and password
+      parameters:
+      - description: User registration request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/create.CreateUserByPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/errs.Incident'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Incident'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Incident'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errs.Incident'
+      summary: Register a new user
 swagger: "2.0"
